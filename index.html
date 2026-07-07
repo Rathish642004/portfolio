@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>~/rathish — Backend Engineer</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2264%22%20height%3D%2264%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2212%22%20fill%3D%22%230b0d11%22%2F%3E%3Crect%20x%3D%2211%22%20y%3D%2211%22%20width%3D%2242%22%20height%3D%2242%22%20rx%3D%228%22%20fill%3D%22none%22%20stroke%3D%22%232a3140%22%20stroke-width%3D%221.5%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2242%22%20font-family%3D%22monospace%22%20font-size%3D%2226%22%20font-weight%3D%22700%22%20fill%3D%22%233b82f6%22%20text-anchor%3D%22middle%22%3E~%2F%3C%2Ftext%3E%3C%2Fsvg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
+<style>
+/* ===== COLORS ===== */
+:root {
+  --neutral-950:#08090b; --neutral-925:#0b0d11; --neutral-900:#0e1117;
+  --neutral-850:#13161d; --neutral-800:#181c25; --neutral-750:#1f242f;
+  --neutral-700:#2a3140; --neutral-600:#3a4253; --neutral-500:#5c6573;
+  --neutral-400:#7d8796; --neutral-300:#9aa4b2; --neutral-200:#c3cad6;
+  --neutral-100:#e6e9ef; --neutral-050:#f4f6fa;
+  --blue-700:#1d4ed8; --blue-600:#2563eb; --blue-500:#3b82f6;
+  --blue-400:#60a5fa; --blue-300:#93c5fd;
+  --blue-glow:rgba(59,130,246,0.16); --blue-glow-strong:rgba(59,130,246,0.32); --blue-tint:rgba(59,130,246,0.10);
+  --term-green:#3fb950; --term-cyan:#56d4dd; --term-amber:#d29922; --term-red:#f85149; --term-purple:#bc8cff;
+  --surface-page:var(--neutral-925); --surface-base:var(--neutral-900); --surface-raised:var(--neutral-850);
+  --surface-card:var(--neutral-800); --surface-hover:var(--neutral-750); --surface-inset:var(--neutral-950);
+  --text-primary:var(--neutral-100); --text-secondary:var(--neutral-300); --text-tertiary:var(--neutral-400);
+  --text-muted:var(--neutral-500); --text-bright:var(--neutral-050); --text-on-accent:#ffffff;
+  --border-subtle:var(--neutral-600); --border-default:var(--neutral-700); --border-strong:var(--neutral-500); --border-accent:var(--blue-500);
+  --accent:var(--blue-500); --accent-hover:var(--blue-400); --accent-active:var(--blue-600);
+  --accent-muted:var(--blue-tint); --accent-text:var(--blue-400);
+  --status-online:var(--term-green); --status-warn:var(--term-amber); --status-error:var(--term-red);
+  --selection-bg:var(--blue-glow-strong);
+}
+::selection { background:var(--selection-bg); color:var(--text-bright); }
+
+/* ===== TYPOGRAPHY ===== */
+:root {
+  --font-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --font-sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --text-2xs:11px; --text-xs:12px; --text-sm:13px; --text-base:15px; --text-md:17px;
+  --text-lg:20px; --text-xl:25px; --text-2xl:32px; --text-3xl:42px; --text-4xl:56px; --text-5xl:76px;
+  --weight-regular:400; --weight-medium:500; --weight-semibold:600; --weight-bold:700;
+  --leading-tight:1.05; --leading-snug:1.25; --leading-normal:1.5; --leading-relaxed:1.7;
+  --tracking-tight:-0.02em; --tracking-normal:0; --tracking-wide:0.04em; --tracking-wider:0.12em;
+  --font-display:var(--font-mono); --font-heading:var(--font-mono);
+  --font-body:var(--font-sans); --font-label:var(--font-mono); --font-code:var(--font-mono);
+}
+
+/* ===== SPACING & LAYOUT ===== */
+:root {
+  --space-0:0; --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:20px;
+  --space-6:24px; --space-8:32px; --space-10:40px; --space-12:48px; --space-16:64px;
+  --space-20:80px; --space-24:96px; --space-32:128px;
+  --radius-xs:3px; --radius-sm:5px; --radius-md:8px; --radius-lg:12px; --radius-pill:999px;
+  --border-width:1px; --border-width-thick:2px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.4); --shadow-md:0 4px 16px rgba(0,0,0,0.45); --shadow-lg:0 16px 48px rgba(0,0,0,0.55);
+  --shadow-inset:inset 0 1px 0 rgba(255,255,255,0.04);
+  --glow-accent:0 0 0 1px var(--blue-500),0 0 24px var(--blue-glow);
+  --glow-focus:0 0 0 2px var(--surface-page),0 0 0 4px var(--blue-500);
+  --container-max:1080px; --container-wide:1280px; --section-pad-y:var(--space-24); --gutter:var(--space-6);
+  --ease-out:cubic-bezier(0.16,1,0.3,1); --ease-std:cubic-bezier(0.4,0,0.2,1);
+  --dur-fast:120ms; --dur-med:220ms; --dur-slow:400ms;
+}
+
+/* ===== BASE ===== */
+*,*::before,*::after { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  margin:0; background:var(--surface-page); color:var(--text-primary);
+  font-family:var(--font-body); -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(rgba(255,255,255,0.022) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+a { color:inherit; }
+::-webkit-scrollbar { width:10px; }
+::-webkit-scrollbar-thumb { background:var(--neutral-700); border-radius:999px; }
+::-webkit-scrollbar-track { background:var(--surface-page); }
+@keyframes rds-blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+@media (max-width:860px) {
+  section > div { grid-template-columns:1fr !important; }
+  h1 { font-size:var(--text-3xl) !important; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- ===== DESIGN SYSTEM BUNDLE ===== -->
+<script type="text/babel">
+function Badge({ tone="neutral", dot=false, children, style, ...rest }) {
+  const tones = {
+    neutral:{ color:"var(--text-tertiary)", dotColor:"var(--text-muted)" },
+    online: { color:"var(--term-green)",    dotColor:"var(--term-green)"  },
+    accent: { color:"var(--accent-text)",   dotColor:"var(--accent)"      },
+    warn:   { color:"var(--term-amber)",    dotColor:"var(--term-amber)"  },
+  };
+  const t = tones[tone] || tones.neutral;
+  return (
+    <span {...rest} style={{ display:"inline-flex", alignItems:"center", gap:"7px", padding:"3px 10px 3px 9px", fontFamily:"var(--font-mono)", fontSize:"var(--text-2xs)", fontWeight:"var(--weight-medium)", letterSpacing:"var(--tracking-wide)", textTransform:"uppercase", lineHeight:1.4, borderRadius:"var(--radius-pill)", border:"1px solid var(--border-default)", background:"var(--surface-raised)", color:t.color, ...style }}>
+      {dot && <span style={{ width:"6px", height:"6px", borderRadius:"50%", background:t.dotColor, boxShadow:tone==="online"?"0 0 8px var(--term-green)":"none", flex:"none" }} />}
+      {children}
+    </span>
+  );
+}
+
+function Button({ variant="primary", size="md", as="button", icon=null, iconRight=null, children, style, ...rest }) {
+  const sizes = {
+    sm:{ padding:"6px 12px",  fontSize:"var(--text-xs)",   height:"30px", gap:"6px"  },
+    md:{ padding:"9px 18px",  fontSize:"var(--text-sm)",   height:"38px", gap:"8px"  },
+    lg:{ padding:"13px 24px", fontSize:"var(--text-base)", height:"48px", gap:"10px" },
+  };
+  const variants = {
+    primary:  { background:"var(--accent)",       color:"var(--text-on-accent)", border:"1px solid var(--accent)",        boxShadow:"0 0 0 0 var(--blue-glow)" },
+    secondary:{ background:"var(--surface-card)", color:"var(--text-primary)",   border:"1px solid var(--border-default)" },
+    ghost:    { background:"transparent",         color:"var(--text-secondary)", border:"1px solid transparent"          },
+    outline:  { background:"transparent",         color:"var(--accent-text)",    border:"1px solid var(--border-accent)"  },
+  };
+  const Comp = as;
+  const s = sizes[size] || sizes.md;
+  const v = variants[variant] || variants.primary;
+  return (
+    <Comp {...rest} style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", gap:s.gap, height:s.height, padding:s.padding, fontFamily:"var(--font-mono)", fontSize:s.fontSize, fontWeight:"var(--weight-medium)", letterSpacing:"0.01em", lineHeight:1, borderRadius:"var(--radius-sm)", cursor:"pointer", textDecoration:"none", whiteSpace:"nowrap", transition:"background var(--dur-fast) var(--ease-std),border-color var(--dur-fast) var(--ease-std),color var(--dur-fast) var(--ease-std),box-shadow var(--dur-med) var(--ease-out)", ...v, ...style }}
+      onMouseEnter={(e)=>{
+        if(variant==="primary")   { e.currentTarget.style.background="var(--accent-hover)"; e.currentTarget.style.borderColor="var(--accent-hover)"; e.currentTarget.style.boxShadow="0 0 24px var(--blue-glow)"; }
+        else if(variant==="secondary"){ e.currentTarget.style.background="var(--surface-hover)"; e.currentTarget.style.borderColor="var(--border-strong)"; }
+        else if(variant==="ghost")    { e.currentTarget.style.color="var(--text-primary)"; e.currentTarget.style.background="var(--surface-raised)"; }
+        else if(variant==="outline")  { e.currentTarget.style.background="var(--accent-muted)"; e.currentTarget.style.color="var(--accent-hover)"; }
+        rest.onMouseEnter && rest.onMouseEnter(e);
+      }}
+      onMouseLeave={(e)=>{
+        Object.assign(e.currentTarget.style,{ background:v.background, color:v.color, borderColor:v.border.split(" ").slice(2).join(" "), boxShadow:v.boxShadow||"none" });
+        rest.onMouseLeave && rest.onMouseLeave(e);
+      }}
+    >{icon}{children}{iconRight}</Comp>
+  );
+}
+
+function Cursor({ color="var(--accent)", height="1em", width="0.5em", style, ...rest }) {
+  return (
+    <span {...rest} className={"rds-cursor "+(rest.className||"")} style={{ display:"inline-block", width, height, background:color, marginLeft:"2px", verticalAlign:"text-bottom", animation:"rds-blink 1.1s steps(1) infinite", ...style }} />
+  );
+}
+
+function SectionLabel({ prefix="//", children, color="var(--accent-text)", style, ...rest }) {
+  return (
+    <div {...rest} style={{ display:"inline-flex", alignItems:"center", gap:"10px", fontFamily:"var(--font-mono)", fontSize:"var(--text-xs)", fontWeight:"var(--weight-medium)", letterSpacing:"var(--tracking-wider)", textTransform:"uppercase", color:"var(--text-tertiary)", ...style }}>
+      <span style={{ color, fontWeight:"var(--weight-semibold)" }}>{prefix}</span>
+      {children}
+    </div>
+  );
+}
+
+function StatBlock({ value, label, accent=false, style, ...rest }) {
+  return (
+    <div {...rest} style={{ display:"flex", flexDirection:"column", gap:"6px", ...style }}>
+      <span style={{ fontFamily:"var(--font-mono)", fontSize:"var(--text-2xl)", fontWeight:"var(--weight-semibold)", lineHeight:1, letterSpacing:"var(--tracking-tight)", color:accent?"var(--accent-text)":"var(--text-bright)" }}>{value}</span>
+      <span style={{ fontFamily:"var(--font-mono)", fontSize:"var(--text-2xs)", letterSpacing:"var(--tracking-wide)", textTransform:"uppercase", color:"var(--text-muted)" }}>{label}</span>
+    </div>
+  );
+}
+
+function Tag({ variant="default", children, style, ...rest }) {
+  const variants = {
+    default:{ background:"var(--surface-raised)", color:"var(--text-secondary)", borderColor:"var(--border-default)" },
+    accent: { background:"var(--accent-muted)",   color:"var(--accent-text)",    borderColor:"rgba(59,130,246,0.35)" },
+    solid:  { background:"var(--surface-card)",   color:"var(--text-primary)",   borderColor:"var(--border-strong)"  },
+  };
+  const v = variants[variant] || variants.default;
+  return (
+    <span {...rest} style={{ display:"inline-flex", alignItems:"center", gap:"6px", padding:"4px 10px", fontFamily:"var(--font-mono)", fontSize:"var(--text-xs)", fontWeight:"var(--weight-medium)", lineHeight:1.4, borderRadius:"var(--radius-xs)", border:"1px solid", ...v, ...style }}>
+      {children}
+    </span>
+  );
+}
+
+function TerminalWindow({ title="bash", dots=true, children, bodyStyle, style, ...rest }) {
+  return (
+    <div {...rest} style={{ background:"var(--surface-base)", border:"1px solid var(--border-default)", borderRadius:"var(--radius-md)", overflow:"hidden", boxShadow:"var(--shadow-md)", ...style }}>
+      <div style={{ display:"flex", alignItems:"center", gap:"10px", padding:"10px 14px", background:"var(--surface-raised)", borderBottom:"1px solid var(--border-default)" }}>
+        {dots && (
+          <div style={{ display:"flex", gap:"7px" }}>
+            {["#3a4253","#3a4253","#3a4253"].map((c,i)=><span key={i} style={{ width:"11px", height:"11px", borderRadius:"50%", background:c }} />)}
+          </div>
+        )}
+        <span style={{ fontFamily:"var(--font-mono)", fontSize:"var(--text-xs)", color:"var(--text-muted)", letterSpacing:"0.02em", marginLeft:dots?"4px":0 }}>{title}</span>
+      </div>
+      <div style={{ padding:"var(--space-6)", fontFamily:"var(--font-mono)", ...bodyStyle }}>{children}</div>
+    </div>
+  );
+}
+
+function NavBar({ brand="~/rathish", links=[], cta=null, active, style, ...rest }) {
+  return (
+    <header {...rest} style={{ position:"sticky", top:0, zIndex:50, display:"flex", alignItems:"center", justifyContent:"space-between", gap:"var(--space-6)", padding:"14px var(--space-8)", background:"rgba(11,13,17,0.72)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", borderBottom:"1px solid var(--border-default)", ...style }}>
+      <a href="#top" style={{ fontFamily:"var(--font-mono)", fontSize:"var(--text-sm)", fontWeight:"var(--weight-semibold)", color:"var(--text-bright)", textDecoration:"none", letterSpacing:"0.01em" }}>
+        <span style={{ color:"var(--accent-text)" }}>{brand.split("/")[0]}/</span>
+        {brand.split("/").slice(1).join("/")}
+      </a>
+      <nav style={{ display:"flex", alignItems:"center", gap:"var(--space-6)" }}>
+        {links.map((l)=>{
+          const isActive = active===l.id || active===l.label;
+          return (
+            <a key={l.label} href={l.href} style={{ fontFamily:"var(--font-mono)", fontSize:"var(--text-xs)", letterSpacing:"0.02em", textDecoration:"none", color:isActive?"var(--accent-text)":"var(--text-tertiary)", transition:"color var(--dur-fast) var(--ease-std)" }}
+              onMouseEnter={(e)=>(e.currentTarget.style.color="var(--text-primary)")}
+              onMouseLeave={(e)=>(e.currentTarget.style.color=isActive?"var(--accent-text)":"var(--text-tertiary)")}
+            >{l.label}</a>
+          );
+        })}
+        {cta}
+      </nav>
+    </header>
+  );
+}
+
+function ExperienceItem({ role, company, period, current=false, bullets=[], stack=[], style, ...rest }) {
+  return (
+    <div {...rest} style={{ position:"relative", paddingLeft:"var(--space-8)", paddingBottom:"var(--space-8)", borderLeft:"1px solid var(--border-default)", ...style }}>
+      <span style={{ position:"absolute", left:"-6px", top:"4px", width:"11px", height:"11px", borderRadius:"50%", background:current?"var(--accent)":"var(--surface-card)", border:"2px solid "+(current?"var(--accent)":"var(--border-strong)"), boxShadow:current?"0 0 12px var(--blue-glow-strong)":"none" }} />
+      <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:"10px", marginBottom:"4px" }}>
+        <h3 style={{ margin:0, fontFamily:"var(--font-mono)", fontSize:"var(--text-md)", fontWeight:"var(--weight-semibold)", color:"var(--text-bright)" }}>{role}</h3>
+        {current && <Badge tone="online" dot>Present</Badge>}
+      </div>
+      <div style={{ display:"flex", flexWrap:"wrap", gap:"10px", fontFamily:"var(--font-mono)", fontSize:"var(--text-xs)", color:"var(--text-tertiary)", marginBottom:"var(--space-4)" }}>
+        <span style={{ color:"var(--accent-text)" }}>{company}</span>
+        <span style={{ color:"var(--text-muted)" }}>{period}</span>
+      </div>
+      {bullets.length>0 && (
+        <ul style={{ margin:"0 0 var(--space-4)", padding:0, listStyle:"none", display:"flex", flexDirection:"column", gap:"8px" }}>
+          {bullets.map((b,i)=>(
+            <li key={i} style={{ display:"flex", gap:"10px", fontFamily:"var(--font-body)", fontSize:"var(--text-sm)", lineHeight:"var(--leading-normal)", color:"var(--text-secondary)" }}>
+              <span style={{ color:"var(--accent-text)", fontFamily:"var(--font-mono)", flex:"none" }}>›</span>
+              <span>{b}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {stack.length>0 && (
+        <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
+          {stack.map((t)=><Tag key={t}>{t}</Tag>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ProjectCard({ name, description, stack=[], href, year, solo=false, style, ...rest }) {
+  const [hover,setHover] = React.useState(false);
+  return (
+    <div {...rest}
+      onMouseEnter={(e)=>{ setHover(true); rest.onMouseEnter&&rest.onMouseEnter(e); }}
+      onMouseLeave={(e)=>{ setHover(false); rest.onMouseLeave&&rest.onMouseLeave(e); }}
+      style={{ display:"flex", flexDirection:"column", gap:"var(--space-4)", background:"var(--surface-card)", border:"1px solid "+(hover?"var(--border-strong)":"var(--border-default)"), borderRadius:"var(--radius-md)", padding:"var(--space-6)", boxShadow:hover?"var(--shadow-md),0 0 0 1px var(--blue-glow)":"var(--shadow-sm)", transition:"border-color var(--dur-med) var(--ease-std),box-shadow var(--dur-med) var(--ease-out)", ...style }}
+    >
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        <span style={{ fontFamily:"var(--font-mono)", fontSize:"var(--text-2xs)", letterSpacing:"var(--tracking-wide)", color:"var(--text-muted)" }}>
+          {href ? "~/"+href.replace(/^https?:\/\//,"").split("/")[0] : "~/project"}
+        </span>
+        {(year||solo) && (
+          <span style={{ display:"flex", alignItems:"center", gap:"8px", fontFamily:"var(--font-mono)", fontSize:"var(--text-2xs)", color:"var(--text-muted)" }}>
+            {solo && <span style={{ color:"var(--term-green)", letterSpacing:"0.06em" }}>SOLO</span>}
+            {year && <span>{year}</span>}
+          </span>
+        )}
+      </div>
+      <div style={{ display:"flex", alignItems:"center", gap:"10px" }}>
+        <h3 style={{ margin:0, fontFamily:"var(--font-mono)", fontSize:"var(--text-lg)", fontWeight:"var(--weight-semibold)", letterSpacing:"var(--tracking-tight)", color:hover?"var(--accent-text)":"var(--text-bright)", transition:"color var(--dur-med) var(--ease-std)" }}>{name}</h3>
+        {href && <span style={{ fontFamily:"var(--font-mono)", color:"var(--accent-text)", fontSize:"var(--text-base)", transform:hover?"translate(2px,-2px)":"none", transition:"transform var(--dur-med) var(--ease-out)" }}>↗</span>}
+      </div>
+      <p style={{ margin:0, fontFamily:"var(--font-body)", fontSize:"var(--text-sm)", lineHeight:"var(--leading-relaxed)", color:"var(--text-secondary)", flex:1 }}>{description}</p>
+      {stack.length>0 && (
+        <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
+          {stack.map((t)=><Tag key={t}>{t}</Tag>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SkillGroup({ category, skills=[], style, ...rest }) {
+  return (
+    <div {...rest} style={{ display:"flex", flexDirection:"column", gap:"var(--space-3)", ...style }}>
+      <div style={{ display:"flex", alignItems:"center", gap:"8px", fontFamily:"var(--font-mono)", fontSize:"var(--text-xs)", letterSpacing:"var(--tracking-wide)", textTransform:"uppercase", color:"var(--text-tertiary)" }}>
+        <span style={{ color:"var(--term-green)" }}>$</span>{category}
+      </div>
+      <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
+        {skills.map((s)=><Tag key={s}>{s}</Tag>)}
+      </div>
+    </div>
+  );
+}
+
+window.RathishPortfolioDesignSystem_2eb0e9 = {
+  Badge, Button, Cursor, SectionLabel, StatBlock, Tag, TerminalWindow,
+  NavBar, ExperienceItem, ProjectCard, SkillGroup
+};
+</script>
+
+<!-- ===== PORTFOLIO DATA ===== -->
+<script>
+window.PORTFOLIO_DATA = {
+  name:"Rathish", title:"Backend Engineer", focus:"FinTech, Crypto & AI Systems",
+  tagline:"Production backend engineer — fintech trading systems, crypto infrastructure, and AI-powered applications. Built solo, from schema to deployment.",
+  location:"Chennai, Tamil Nadu, India",
+  email:"rathish642004@gmail.com", phone:"+91 97509 99906", phoneRaw:"919750999906",
+  linkedin:"https://www.linkedin.com/in/rathish-s-80a84324b",
+  linkedinLabel:"linkedin.com/in/rathish-s",
+  github:"https://github.com/Rathish642004", githubLabel:"github.com/Rathish642004",
+  resume:"Rathish-Resume.pdf",
+  summary:"Backend Engineer with experience designing and building production-grade fintech and crypto systems. Skilled in developing scalable APIs, real-time applications, asynchronous workflows, and blockchain integrations. Experienced in Python and Node.js ecosystems with a strong interest in system design, distributed systems, and AI-powered applications.",
+  stats:[
+    { value:"200+", label:"REST APIs built solo" },
+    { value:"2",    label:"Prod systems owned"   },
+    { value:"100%", label:"Solo-architected"      },
+  ],
+  experience:[
+    {
+      role:"Backend Engineer", company:"INOCYX Technologies", period:"Apr 2025 – Present", current:true,
+      bullets:[
+        "Sole architect and developer of a production-grade OTC crypto trading platform — designed the entire system from database schema to API layer, serving live high-volume users.",
+        "Engineered 200+ RESTful APIs covering trade execution, wallet operations, user management, order workflows, and compliance — all built and maintained solo.",
+        "Built WebSocket-based real-time systems for live price updates, order-book feeds, and push notifications at production-scale concurrency.",
+        "Designed async pipelines with Celery + Redis for task queuing, background scheduling, and event-driven workflows in a high-throughput environment.",
+        "Integrated blockchain wallet systems for secure deposits, withdrawals, and on-chain transaction tracking across multiple networks.",
+        "Implemented the full AML compliance stack: KYB, Travel Rule, and TRM (Transaction Risk Monitoring).",
+        "Solo-built a complete NestJS admin backend — granular RBAC, JWT auth, IP allow/block enforcement, and modular role hierarchy.",
+        "Managed AWS production deployment (Nginx, Uvicorn); solely responsible for uptime, monitoring, and incident resolution.",
+      ],
+      stack:["Django","DRF","NestJS","Celery","Redis","WebSockets","AWS"],
+    },
+    {
+      role:"Backend Developer Intern", company:"INOCYX Technologies", period:"Jun 2024 – Mar 2025", current:false,
+      bullets:[
+        "Built CoinDeck solo — a Django crypto dashboard integrating CoinSwitch APIs for real-time asset tracking, portfolio management, and withdrawal flows.",
+        "Developed an automated trading bot with Django + Binance API — rule-based order execution and real-time signal processing.",
+        "Progressed from intern to sole owner of the company's core production platform within 10 months.",
+      ],
+      stack:["Django","DRF","CoinSwitch API","Binance API"],
+    },
+  ],
+  projects:[
+    { name:"OTC Trading Platform", year:"2025", solo:true, description:"Production-grade OTC crypto trading platform built from scratch with secure trade execution, real-time WebSocket updates, async processing, blockchain wallet integration, and AML compliance (KYB, Travel Rule, TRM). Live at production scale on AWS.", stack:["Django","DRF","Celery","Redis","WebSockets","MongoDB","AWS"] },
+    { name:"Crypto Exchange Admin", year:"2025", solo:true, description:"Built from zero to fully operational, independently. Hierarchical RBAC (role creation, permission scoping), JWT auth, IP allow/block enforcement, and a modular architecture for managing exchange operations.", stack:["NestJS","Node.js","MongoDB","JWT"] },
+    { name:"AI Customer Support Assistant", year:"2025", solo:true, description:"Intelligent support system capable of answering user queries using contextual knowledge and document retrieval. Built with LLM integration, vector search via Qdrant, and prompt engineering for accurate, context-aware responses.", stack:["Python","LLMs","Qdrant","Prompt Engineering"] },
+    { name:"Tinks Uniforms Website", year:"2024", solo:true, href:"https://tinksuniforms.in", description:"Responsive business website for Tinks Uniforms — designed and developed from scratch with a clean, modern UI and full mobile support.", stack:["Next.js","TypeScript","Tailwind CSS"] },
+    { name:"CoinDeck — Crypto Dashboard", year:"2024", solo:true, description:"Crypto dashboard with real-time asset tracking, portfolio management, and transaction handling via CoinSwitch API. Full backend ownership: authentication, data normalisation, and API layer.", stack:["Django","DRF","CoinSwitch API"] },
+  ],
+  skills:[
+    { category:"Languages",            skills:["Python","JavaScript","TypeScript"] },
+    { category:"Backend",              skills:["Django","DRF","Node.js","NestJS"] },
+    { category:"Databases",            skills:["MongoDB","MySQL","Redis"] },
+    { category:"Real-Time & Async",    skills:["Celery","WebSockets","Event-Driven Architecture"] },
+    { category:"DevOps",               skills:["AWS","Linux","Nginx","Uvicorn","Git"] },
+    { category:"Blockchain & FinTech", skills:["Wallet Integrations","KYB","Travel Rule","TRM","Exchange APIs"] },
+  ],
+  education:{ degree:"B.E. Electronics & Communication Engineering", school:"Jeppiaar Engineering College", period:"2021 – 2025", cgpa:"7.9" },
+  certifications:[
+    "Programming, Data Structures & Algorithms using Python — NPTEL",
+    "Advanced Django REST Framework — Coursera",
+    "Programming with JavaScript — Coursera",
+  ],
+  interests:["System Design","Distributed Systems","Artificial Intelligence","Event-Driven Architecture","High-Performance Backend Systems"],
+};
+</script>
+
+<!-- ===== PARTS: Section + Footer ===== -->
+<script type="text/babel">
+const _DS = window.RathishPortfolioDesignSystem_2eb0e9;
+
+function Section({ id, label, prefix="//", title, children, style }) {
+  const { SectionLabel } = _DS;
+  return (
+    <section id={id} style={{ padding:"var(--section-pad-y) var(--gutter)", borderTop:"1px solid var(--border-default)", ...style }}>
+      <div style={{ maxWidth:"var(--container-max)", margin:"0 auto" }}>
+        <div style={{ marginBottom:"var(--space-12)" }}>
+          {label && <SectionLabel prefix={prefix} style={{ marginBottom:"var(--space-3)" }}>{label}</SectionLabel>}
+          {title && <h2 style={{ margin:0, fontFamily:"var(--font-mono)", fontSize:"var(--text-2xl)", fontWeight:"var(--weight-semibold)", letterSpacing:"var(--tracking-tight)", color:"var(--text-bright)" }}>{title}</h2>}
+        </div>
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  const d = window.PORTFOLIO_DATA;
+  return (
+    <footer style={{ padding:"var(--space-12) var(--gutter)", borderTop:"1px solid var(--border-default)", background:"var(--surface-base)" }}>
+      <div style={{ maxWidth:"var(--container-max)", margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:"var(--space-4)", fontFamily:"var(--font-mono)", fontSize:"var(--text-xs)", color:"var(--text-muted)" }}>
+        <span><span style={{ color:"var(--accent-text)" }}>~/</span>{d.name.toLowerCase()} — fintech & crypto backends, built solo.</span>
+        <span style={{ display:"flex", gap:"var(--space-5)" }}>
+          <a href={"mailto:"+d.email} style={{ color:"var(--text-tertiary)", textDecoration:"none" }}>email</a>
+          <a href={d.linkedin} target="_blank" rel="noreferrer" style={{ color:"var(--text-tertiary)", textDecoration:"none" }}>linkedin</a>
+          <a href={d.github}   target="_blank" rel="noreferrer" style={{ color:"var(--text-tertiary)", textDecoration:"none" }}>github</a>
+          <a href={"tel:"+d.phoneRaw} style={{ color:"var(--text-tertiary)", textDecoration:"none" }}>{d.phone}</a>
+        </span>
+      </div>
+    </footer>
+  );
+}
+
+Object.assign(window, { Section, Footer });
+</script>
+
+<!-- ===== HERO ===== -->
+<script type="text/babel">
+function HeroLine({ cmd }) {
+  return (
+    <div style={{ color:"var(--text-primary)", marginTop:"10px", fontSize:"var(--text-sm)" }}>
+      <span style={{ color:"var(--term-green)" }}>$</span> {cmd}
+    </div>
+  );
+}
+function HeroOut({ children, color }) {
+  return <div style={{ color:color||"var(--text-secondary)", fontSize:"var(--text-sm)", marginTop:"2px" }}>{children}</div>;
+}
+
+function Hero() {
+  const { Button, Badge, Cursor, TerminalWindow, StatBlock } = window.RathishPortfolioDesignSystem_2eb0e9;
+  const d = window.PORTFOLIO_DATA;
+  return (
+    <section id="top" style={{ position:"relative", padding:"120px var(--gutter) 88px", overflow:"hidden" }}>
+      <div style={{ position:"absolute", top:"60px", left:"50%", transform:"translateX(-50%)", width:"640px", height:"360px", background:"radial-gradient(ellipse at center,var(--blue-glow) 0%,transparent 70%)", pointerEvents:"none" }} />
+      <div style={{ position:"relative", maxWidth:"var(--container-max)", margin:"0 auto", display:"grid", gridTemplateColumns:"1.25fr 1fr", gap:"var(--space-16)", alignItems:"center" }}>
+        <div>
+          <Badge tone="online" dot style={{ marginBottom:"var(--space-6)" }}>Open to Software Engineer opportunities</Badge>
+          <h1 style={{ margin:"0 0 var(--space-5)", fontFamily:"var(--font-mono)", fontSize:"var(--text-4xl)", fontWeight:"var(--weight-bold)", letterSpacing:"var(--tracking-tight)", lineHeight:1.04, color:"var(--text-bright)" }}>
+            <span style={{ color:"var(--accent-text)" }}>~/</span>{d.name}<Cursor width="0.42em" height="0.9em" />
+          </h1>
+          <p style={{ margin:"0 0 var(--space-3)", fontFamily:"var(--font-mono)", fontSize:"var(--text-md)", color:"var(--text-tertiary)", letterSpacing:"0.01em" }}>
+            {d.title} · {d.focus}
+          </p>
+          <p style={{ margin:"0 0 var(--space-8)", maxWidth:"44ch", fontFamily:"var(--font-body)", fontSize:"var(--text-md)", lineHeight:"var(--leading-relaxed)", color:"var(--text-secondary)" }}>
+            {d.tagline}
+          </p>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:"var(--space-3)", marginBottom:"var(--space-10)" }}>
+            <Button variant="primary"   size="lg" as="a" href="#projects">View projects</Button>
+            <Button variant="secondary" size="lg" as="a" href="#contact">Get in touch</Button>
+            <Button variant="outline"   size="lg" as="a" href={d.resume} download>Résumé ↓</Button>
+          </div>
+          <div style={{ display:"flex", gap:"var(--space-12)" }}>
+            {d.stats.map((s,i)=><StatBlock key={i} value={s.value} label={s.label} accent={i===0} />)}
+          </div>
+        </div>
+        <TerminalWindow title="rathish@dev: ~" style={{ fontSize:"var(--text-sm)" }}>
+          <HeroLine cmd="whoami" /><HeroOut>Backend engineer · fintech, crypto &amp; AI</HeroOut>
+          <HeroLine cmd="cat stack.txt" />
+          <HeroOut color="var(--accent-text)">Python · Django · DRF · NestJS · Node.js</HeroOut>
+          <HeroOut color="var(--accent-text)">Celery · Redis · WebSockets · MongoDB · AWS</HeroOut>
+          <HeroLine cmd="cat ai.log" />
+          <HeroOut color="var(--term-purple)">LLMs · Qdrant · vector search · prompt engineering</HeroOut>
+          <HeroLine cmd="cat ownership.log" />
+          <HeroOut>production systems · architected &amp; owned solo</HeroOut>
+          <div style={{ marginTop:"10px", color:"var(--term-green)", fontSize:"var(--text-sm)" }}>
+            $ <span style={{ display:"inline-block", width:"8px", height:"15px", background:"var(--term-green)", verticalAlign:"-2px", animation:"rds-blink 1.1s steps(1) infinite" }} />
+          </div>
+        </TerminalWindow>
+      </div>
+    </section>
+  );
+}
+window.Hero = Hero;
+</script>
+
+<!-- ===== ABOUT ===== -->
+<script type="text/babel">
+function AboutFact({ k, v, accent, href }) {
+  return (
+    <div style={{ display:"flex", gap:"12px", padding:"7px 0", lineHeight:1.5 }}>
+      <span style={{ color:"var(--text-muted)", minWidth:"84px" }}>{k}</span>
+      {href
+        ? <a href={href} target="_blank" rel="noreferrer" style={{ color:"var(--accent-text)", textDecoration:"none" }}>{v}</a>
+        : <span style={{ color:accent?"var(--accent-text)":"var(--text-secondary)" }}>{v}</span>
+      }
+    </div>
+  );
+}
+
+function About() {
+  const { Tag } = window.RathishPortfolioDesignSystem_2eb0e9;
+  const d = window.PORTFOLIO_DATA;
+  return (
+    <Section id="about" label="whoami" prefix="$" title="A backend engineer who ships.">
+      <div style={{ display:"grid", gridTemplateColumns:"1.3fr 1fr", gap:"var(--space-12)", alignItems:"start" }}>
+        <p style={{ margin:0, fontFamily:"var(--font-body)", fontSize:"var(--text-md)", lineHeight:"var(--leading-relaxed)", color:"var(--text-secondary)" }}>{d.summary}</p>
+        <div style={{ background:"var(--surface-card)", border:"1px solid var(--border-default)", borderRadius:"var(--radius-md)", padding:"var(--space-6)", fontFamily:"var(--font-mono)", fontSize:"var(--text-sm)" }}>
+          <AboutFact k="location"  v={d.location} />
+          <AboutFact k="phone"     v={d.phone} />
+          <AboutFact k="linkedin"  v={d.linkedinLabel} href={d.linkedin} accent />
+          <AboutFact k="github"    v={d.githubLabel}   href={d.github}   accent />
+          <AboutFact k="education" v={d.education.degree} />
+          <AboutFact k="school"    v={d.education.school+" · "+d.education.period} />
+          <div style={{ marginTop:"var(--space-5)", paddingTop:"var(--space-5)", borderTop:"1px solid var(--border-default)" }}>
+            <div style={{ color:"var(--text-muted)", fontSize:"var(--text-xs)", letterSpacing:"0.04em", marginBottom:"10px" }}>// interests</div>
+            <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
+              {d.interests.map((i)=><Tag key={i}>{i}</Tag>)}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Section>
+  );
+}
+window.About = About;
+</script>
+
+<!-- ===== EXPERIENCE ===== -->
+<script type="text/babel">
+function Experience() {
+  const { ExperienceItem } = window.RathishPortfolioDesignSystem_2eb0e9;
+  const d = window.PORTFOLIO_DATA;
+  return (
+    <Section id="work" label="Experience" prefix="//" title="Where I've shipped.">
+      <div style={{ display:"flex", flexDirection:"column" }}>
+        {d.experience.map((e,i)=>(
+          <ExperienceItem key={i} {...e} style={i===d.experience.length-1?{ borderLeft:"1px solid transparent", paddingBottom:0 }:undefined} />
+        ))}
+      </div>
+    </Section>
+  );
+}
+window.Experience = Experience;
+</script>
+
+<!-- ===== PROJECTS ===== -->
+<script type="text/babel">
+function Projects() {
+  const { ProjectCard } = window.RathishPortfolioDesignSystem_2eb0e9;
+  const d = window.PORTFOLIO_DATA;
+  return (
+    <Section id="projects" label="projects" prefix="~/" title="Things I've built.">
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))", gap:"var(--space-5)" }}>
+        {d.projects.map((p,i)=><ProjectCard key={i} {...p} />)}
+      </div>
+    </Section>
+  );
+}
+window.Projects = Projects;
+</script>
+
+<!-- ===== SKILLS ===== -->
+<script type="text/babel">
+function Skills() {
+  const { SkillGroup, Tag } = window.RathishPortfolioDesignSystem_2eb0e9;
+  const d = window.PORTFOLIO_DATA;
+  return (
+    <Section id="skills" label="skills" prefix="$" title="The stack I work in.">
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))", gap:"var(--space-8) var(--space-10)", marginBottom:"var(--space-12)" }}>
+        {d.skills.map((g,i)=><SkillGroup key={i} category={g.category} skills={g.skills} />)}
+      </div>
+      <div style={{ background:"var(--surface-card)", border:"1px solid var(--border-default)", borderRadius:"var(--radius-md)", padding:"var(--space-6)" }}>
+        <div style={{ fontFamily:"var(--font-mono)", fontSize:"var(--text-xs)", letterSpacing:"0.12em", textTransform:"uppercase", color:"var(--text-muted)", marginBottom:"var(--space-4)" }}>
+          <span style={{ color:"var(--accent-text)" }}>//</span> certifications
+        </div>
+        <ul style={{ margin:0, padding:0, listStyle:"none", display:"flex", flexDirection:"column", gap:"10px" }}>
+          {d.certifications.map((c,i)=>(
+            <li key={i} style={{ display:"flex", gap:"10px", fontFamily:"var(--font-body)", fontSize:"var(--text-sm)", color:"var(--text-secondary)" }}>
+              <span style={{ color:"var(--term-green)", fontFamily:"var(--font-mono)", flex:"none" }}>›</span>{c}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Section>
+  );
+}
+window.Skills = Skills;
+</script>
+
+<!-- ===== CONTACT ===== -->
+<script type="text/babel">
+function ContactField({ k, v, href, accent, onCopy, copied }) {
+  const val = href
+    ? <a href={href} target="_blank" rel="noreferrer" style={{ color:"var(--accent-text)", textDecoration:"none", wordBreak:"break-all" }}>{v}</a>
+    : <span style={{ color:accent?"var(--accent-text)":"var(--text-secondary)", wordBreak:"break-all" }}>{v}</span>;
+  return (
+    <div style={{ marginBottom:"14px" }}>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", fontSize:"var(--text-sm)", color:"var(--text-primary)" }}>
+        <span><span style={{ color:"var(--term-green)" }}>$</span>{" echo $"}{k}</span>
+        {onCopy && (
+          <button onClick={onCopy} style={{ background:"none", border:"1px solid var(--border-default)", borderRadius:"var(--radius-xs)", color:copied?"var(--term-green)":"var(--text-muted)", fontFamily:"var(--font-mono)", fontSize:"var(--text-2xs)", padding:"2px 8px", cursor:"pointer" }}>
+            {copied?"✓ copied":"copy"}
+          </button>
+        )}
+      </div>
+      <div style={{ fontSize:accent?"var(--text-base)":"var(--text-sm)", marginTop:"5px" }}>{val}</div>
+    </div>
+  );
+}
+
+function Contact() {
+  const { Button, TerminalWindow } = window.RathishPortfolioDesignSystem_2eb0e9;
+  const d = window.PORTFOLIO_DATA;
+  const [copied,setCopied] = React.useState(false);
+  const copy = () => {
+    navigator.clipboard && navigator.clipboard.writeText(d.email);
+    setCopied(true);
+    setTimeout(()=>setCopied(false), 1600);
+  };
+  return (
+    <Section id="contact" label="contact" prefix="$" title="Let's build something solid.">
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"var(--space-12)", alignItems:"center" }}>
+        <div>
+          <p style={{ margin:"0 0 var(--space-8)", fontFamily:"var(--font-body)", fontSize:"var(--text-md)", lineHeight:"var(--leading-relaxed)", color:"var(--text-secondary)", maxWidth:"42ch" }}>
+            Open to backend engineering roles in fintech, crypto, and distributed-systems teams. The fastest way to reach me is email.
+          </p>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:"var(--space-3)" }}>
+            <Button variant="primary"   size="lg" as="a" href={"mailto:"+d.email}>Email me</Button>
+            <Button variant="secondary" size="lg" as="a" href={d.linkedin} target="_blank">LinkedIn</Button>
+            <Button variant="secondary" size="lg" as="a" href={d.github}   target="_blank">GitHub</Button>
+            <Button variant="outline"   size="lg" as="a" href={d.resume} download>Résumé ↓</Button>
+          </div>
+        </div>
+        <TerminalWindow title="contact.sh">
+          <ContactField k="EMAIL"    v={d.email}         accent onCopy={copy} copied={copied} />
+          <ContactField k="PHONE"    v={d.phone}         href={"tel:"+d.phoneRaw} />
+          <ContactField k="LINKEDIN" v={d.linkedinLabel} href={d.linkedin} />
+          <ContactField k="GITHUB"   v={d.githubLabel}   href={d.github} />
+          <ContactField k="LOCATION" v={d.location} />
+        </TerminalWindow>
+      </div>
+    </Section>
+  );
+}
+window.Contact = Contact;
+</script>
+
+<!-- ===== APP ===== -->
+<script type="text/babel">
+function App() {
+  const { NavBar, Button } = window.RathishPortfolioDesignSystem_2eb0e9;
+  const [active,setActive] = React.useState("about");
+  const ids = ["about","work","projects","skills","contact"];
+
+  React.useEffect(()=>{
+    const obs = new IntersectionObserver(
+      (entries)=>{ entries.forEach((e)=>{ if(e.isIntersecting) setActive(e.target.id); }); },
+      { rootMargin:"-45% 0px -50% 0px", threshold:0 }
+    );
+    ids.forEach((id)=>{ const el=document.getElementById(id); if(el) obs.observe(el); });
+    return ()=>obs.disconnect();
+  },[]);
+
+  return (
+    <div>
+      <NavBar
+        brand="~/rathish"
+        active={active}
+        links={[
+          { id:"about",    label:"about",    href:"#about"    },
+          { id:"work",     label:"work",     href:"#work"     },
+          { id:"projects", label:"projects", href:"#projects" },
+          { id:"skills",   label:"skills",   href:"#skills"   },
+          { id:"contact",  label:"contact",  href:"#contact"  },
+        ]}
+        cta={<span style={{ display:"flex", gap:"var(--space-3)" }}>
+          <Button size="sm" variant="ghost" as="a" href={window.PORTFOLIO_DATA.github} target="_blank">github</Button>
+          <Button size="sm" variant="outline" as="a" href={window.PORTFOLIO_DATA.resume} download>résumé ↓</Button>
+        </span>}
+      />
+      <Hero />
+      <About />
+      <Experience />
+      <Projects />
+      <Skills />
+      <Contact />
+      <Footer />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+
+</body>
+</html>
