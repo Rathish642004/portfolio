@@ -73,10 +73,56 @@ a { color:inherit; }
 ::-webkit-scrollbar { width:10px; }
 ::-webkit-scrollbar-thumb { background:var(--neutral-700); border-radius:999px; }
 ::-webkit-scrollbar-track { background:var(--surface-page); }
+html { overflow-x:hidden; }
+body { overflow-x:hidden; }
 @keyframes rds-blink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+
+/* ===== NAV (mobile) ===== */
+.rds-nav-toggle {
+  display:none; align-items:center; justify-content:center;
+  width:36px; height:36px; flex:none;
+  background:none; border:1px solid var(--border-default); border-radius:var(--radius-sm);
+  color:var(--text-primary); font-family:var(--font-mono); font-size:var(--text-md);
+  cursor:pointer;
+}
+.rds-nav-links { display:flex; align-items:center; }
+
+/* ===== RESPONSIVE ===== */
 @media (max-width:860px) {
-  section > div { grid-template-columns:1fr !important; }
+  .rds-hero-grid, .rds-two-col { grid-template-columns:1fr !important; }
+  .rds-hero-grid { gap:var(--space-10) !important; }
   h1 { font-size:var(--text-3xl) !important; }
+}
+
+@media (max-width:700px) {
+  .rds-navbar { padding:14px var(--space-4) !important; position:relative; }
+  .rds-nav-toggle { display:inline-flex !important; }
+  .rds-nav-links {
+    display:none;
+    position:absolute; top:100%; left:0; right:0;
+    flex-direction:column; align-items:flex-start;
+    background:var(--surface-raised);
+    border-bottom:1px solid var(--border-default);
+    box-shadow:var(--shadow-md);
+    padding:var(--space-4) var(--space-6);
+    gap:var(--space-4) !important;
+    z-index:60;
+  }
+  .rds-nav-links.rds-nav-open { display:flex; }
+  .rds-nav-links a { width:100%; }
+  .rds-nav-links > span { width:100%; flex-direction:column !important; align-items:stretch !important; gap:var(--space-2) !important; }
+}
+
+@media (max-width:480px) {
+  section#top { padding:72px var(--gutter) 48px !important; }
+  section { padding-top:var(--space-16) !important; padding-bottom:var(--space-16) !important; }
+  h1 { font-size:var(--text-2xl) !important; }
+  h2 { font-size:var(--text-xl) !important; }
+  .rds-hero-stats { gap:var(--space-6) !important; }
+}
+
+@media (max-width:400px) {
+  .rds-projects-grid, .rds-skills-grid { grid-template-columns:1fr !important; }
 }
 </style>
 </head>
@@ -192,17 +238,28 @@ function TerminalWindow({ title="bash", dots=true, children, bodyStyle, style, .
 }
 
 function NavBar({ brand="~/rathish", links=[], cta=null, active, style, ...rest }) {
+  const [open, setOpen] = React.useState(false);
+  React.useEffect(() => { setOpen(false); }, [active]);
   return (
-    <header {...rest} style={{ position:"sticky", top:0, zIndex:50, display:"flex", alignItems:"center", justifyContent:"space-between", gap:"var(--space-6)", padding:"14px var(--space-8)", background:"rgba(11,13,17,0.72)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", borderBottom:"1px solid var(--border-default)", ...style }}>
+    <header {...rest} className="rds-navbar" style={{ position:"sticky", top:0, zIndex:50, display:"flex", alignItems:"center", justifyContent:"space-between", gap:"var(--space-6)", padding:"14px var(--space-8)", background:"rgba(11,13,17,0.72)", backdropFilter:"blur(12px)", WebkitBackdropFilter:"blur(12px)", borderBottom:"1px solid var(--border-default)", ...style }}>
       <a href="#top" style={{ fontFamily:"var(--font-mono)", fontSize:"var(--text-sm)", fontWeight:"var(--weight-semibold)", color:"var(--text-bright)", textDecoration:"none", letterSpacing:"0.01em" }}>
         <span style={{ color:"var(--accent-text)" }}>{brand.split("/")[0]}/</span>
         {brand.split("/").slice(1).join("/")}
       </a>
-      <nav style={{ display:"flex", alignItems:"center", gap:"var(--space-6)" }}>
+      <button
+        type="button"
+        className="rds-nav-toggle"
+        aria-label={open?"Close menu":"Open menu"}
+        aria-expanded={open}
+        onClick={()=>setOpen((o)=>!o)}
+      >
+        {open ? "✕" : "☰"}
+      </button>
+      <nav className={"rds-nav-links"+(open?" rds-nav-open":"")} style={{ gap:"var(--space-6)" }}>
         {links.map((l)=>{
           const isActive = active===l.id || active===l.label;
           return (
-            <a key={l.label} href={l.href} style={{ fontFamily:"var(--font-mono)", fontSize:"var(--text-xs)", letterSpacing:"0.02em", textDecoration:"none", color:isActive?"var(--accent-text)":"var(--text-tertiary)", transition:"color var(--dur-fast) var(--ease-std)" }}
+            <a key={l.label} href={l.href} onClick={()=>setOpen(false)} style={{ fontFamily:"var(--font-mono)", fontSize:"var(--text-xs)", letterSpacing:"0.02em", textDecoration:"none", color:isActive?"var(--accent-text)":"var(--text-tertiary)", transition:"color var(--dur-fast) var(--ease-std)" }}
               onMouseEnter={(e)=>(e.currentTarget.style.color="var(--text-primary)")}
               onMouseLeave={(e)=>(e.currentTarget.style.color=isActive?"var(--accent-text)":"var(--text-tertiary)")}
             >{l.label}</a>
@@ -422,7 +479,7 @@ function Hero() {
   return (
     <section id="top" style={{ position:"relative", padding:"120px var(--gutter) 88px", overflow:"hidden" }}>
       <div style={{ position:"absolute", top:"60px", left:"50%", transform:"translateX(-50%)", width:"640px", height:"360px", background:"radial-gradient(ellipse at center,var(--blue-glow) 0%,transparent 70%)", pointerEvents:"none" }} />
-      <div style={{ position:"relative", maxWidth:"var(--container-max)", margin:"0 auto", display:"grid", gridTemplateColumns:"1.25fr 1fr", gap:"var(--space-16)", alignItems:"center" }}>
+      <div className="rds-hero-grid" style={{ position:"relative", maxWidth:"var(--container-max)", margin:"0 auto", display:"grid", gridTemplateColumns:"1.25fr 1fr", gap:"var(--space-16)", alignItems:"center" }}>
         <div>
           <Badge tone="online" dot style={{ marginBottom:"var(--space-6)" }}>Open to Software Engineer opportunities</Badge>
           <h1 style={{ margin:"0 0 var(--space-5)", fontFamily:"var(--font-mono)", fontSize:"var(--text-4xl)", fontWeight:"var(--weight-bold)", letterSpacing:"var(--tracking-tight)", lineHeight:1.04, color:"var(--text-bright)" }}>
@@ -439,7 +496,7 @@ function Hero() {
             <Button variant="secondary" size="lg" as="a" href="#contact">Get in touch</Button>
             <Button variant="outline"   size="lg" as="a" href={d.resume} download>Résumé ↓</Button>
           </div>
-          <div style={{ display:"flex", gap:"var(--space-12)" }}>
+          <div className="rds-hero-stats" style={{ display:"flex", flexWrap:"wrap", gap:"var(--space-12)" }}>
             {d.stats.map((s,i)=><StatBlock key={i} value={s.value} label={s.label} accent={i===0} />)}
           </div>
         </div>
@@ -482,7 +539,7 @@ function About() {
   const d = window.PORTFOLIO_DATA;
   return (
     <Section id="about" label="whoami" prefix="$" title="A backend engineer who ships.">
-      <div style={{ display:"grid", gridTemplateColumns:"1.3fr 1fr", gap:"var(--space-12)", alignItems:"start" }}>
+      <div className="rds-two-col" style={{ display:"grid", gridTemplateColumns:"1.3fr 1fr", gap:"var(--space-12)", alignItems:"start" }}>
         <p style={{ margin:0, fontFamily:"var(--font-body)", fontSize:"var(--text-md)", lineHeight:"var(--leading-relaxed)", color:"var(--text-secondary)" }}>{d.summary}</p>
         <div style={{ background:"var(--surface-card)", border:"1px solid var(--border-default)", borderRadius:"var(--radius-md)", padding:"var(--space-6)", fontFamily:"var(--font-mono)", fontSize:"var(--text-sm)" }}>
           <AboutFact k="location"  v={d.location} />
@@ -530,7 +587,7 @@ function Projects() {
   const d = window.PORTFOLIO_DATA;
   return (
     <Section id="projects" label="projects" prefix="~/" title="Things I've built.">
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))", gap:"var(--space-5)" }}>
+      <div className="rds-projects-grid" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))", gap:"var(--space-5)" }}>
         {d.projects.map((p,i)=><ProjectCard key={i} {...p} />)}
       </div>
     </Section>
@@ -546,7 +603,7 @@ function Skills() {
   const d = window.PORTFOLIO_DATA;
   return (
     <Section id="skills" label="skills" prefix="$" title="The stack I work in.">
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))", gap:"var(--space-8) var(--space-10)", marginBottom:"var(--space-12)" }}>
+      <div className="rds-skills-grid" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))", gap:"var(--space-8) var(--space-10)", marginBottom:"var(--space-12)" }}>
         {d.skills.map((g,i)=><SkillGroup key={i} category={g.category} skills={g.skills} />)}
       </div>
       <div style={{ background:"var(--surface-card)", border:"1px solid var(--border-default)", borderRadius:"var(--radius-md)", padding:"var(--space-6)" }}>
@@ -599,7 +656,7 @@ function Contact() {
   };
   return (
     <Section id="contact" label="contact" prefix="$" title="Let's build something solid.">
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"var(--space-12)", alignItems:"center" }}>
+      <div className="rds-two-col" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"var(--space-12)", alignItems:"center" }}>
         <div>
           <p style={{ margin:"0 0 var(--space-8)", fontFamily:"var(--font-body)", fontSize:"var(--text-md)", lineHeight:"var(--leading-relaxed)", color:"var(--text-secondary)", maxWidth:"42ch" }}>
             Open to backend engineering roles in fintech, crypto, and distributed-systems teams. The fastest way to reach me is email.
@@ -653,7 +710,7 @@ function App() {
           { id:"skills",   label:"skills",   href:"#skills"   },
           { id:"contact",  label:"contact",  href:"#contact"  },
         ]}
-        cta={<span style={{ display:"flex", gap:"var(--space-3)" }}>
+        cta={<span style={{ display:"flex", flexWrap:"wrap", gap:"var(--space-3)" }}>
           <Button size="sm" variant="ghost" as="a" href={window.PORTFOLIO_DATA.github} target="_blank">github</Button>
           <Button size="sm" variant="outline" as="a" href={window.PORTFOLIO_DATA.resume} download>résumé ↓</Button>
         </span>}
